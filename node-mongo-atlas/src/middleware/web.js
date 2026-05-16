@@ -18,6 +18,16 @@ export function consumeOldInput(req) {
   return oldInput;
 }
 
+export function peekOldInput(req) {
+  // Lê dados antigos de formulário sem os remover, útil em ecrãs como o login.
+  return req.session.oldInput ?? {};
+}
+
+export function clearOldInput(req) {
+  // Remove dados antigos quando deixam de ser necessários.
+  delete req.session.oldInput;
+}
+
 export function setOldInput(req, data) {
   // Guarda valores submetidos para preencher novamente o formulário após erro.
   req.session.oldInput = data;

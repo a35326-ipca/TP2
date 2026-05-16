@@ -12,7 +12,7 @@ import { StudentProfileDecision } from "../models/StudentProfileDecision.js";
 import { StudyPlan } from "../models/StudyPlan.js";
 import { Unit } from "../models/Unit.js";
 import { User } from "../models/User.js";
-import { consumeOldInput, requireAuth, requireRole, setFlash, setOldInput, verifyCsrf } from "../middleware/web.js";
+import { clearOldInput, consumeOldInput, peekOldInput, requireAuth, requireRole, setFlash, setOldInput, verifyCsrf } from "../middleware/web.js";
 import { cleanText, isStrongPassword, isValidEmail, normalizeEmail, parseGrade, parseOptionalDate, requireObjectId } from "../services/http.js";
 import { dashboardPathFor } from "../services/viewHelpers.js";
 import { hasSubmissionLimitAvailable, registerSubmissionEvent } from "../services/submissions.js";
@@ -103,7 +103,7 @@ webRouter.get("/", (req, res) => {
 // Autenticação: login, registo e fim de sessão.
 webRouter.get("/login", (req, res) => {
   if (req.session.user) return res.redirect(dashboardPathFor(req.session.user.role));
-  return res.render("auth/login", { title: "Gc", oldInput: consumeOldInput(req) });
+  return res.render("auth/login", { title: "Gc", oldInput: peekOldInput(req) });
 });
 
 // Processa credenciais, valida a palavra-passe e cria a sessão do utilizador.
@@ -130,6 +130,7 @@ webRouter.post("/login", asyncRoute(async (req, res) => {
     return res.redirect("/login");
   }
 
+  clearOldInput(req);
   await regenerateSession(req);
   req.session.user = serializeUser(user);
   req.session.lastActivityAt = Date.now();
@@ -184,6 +185,7 @@ webRouter.post("/register", asyncRoute(async (req, res) => {
   }
 
   const user = await User.create({ name, email, passwordHash: await User.hashPassword(password), role: "aluno" });
+  clearOldInput(req);
   await regenerateSession(req);
   req.session.user = serializeUser(user);
   req.session.lastActivityAt = Date.now();
