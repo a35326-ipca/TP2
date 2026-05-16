@@ -1,60 +1,101 @@
 <%- include("../partials/app-start") %>
 
-<section class="app-panel profile-panel">
-  <div class="app-panel__header">
-    <div>
-      <h2>Adicionar alunos</h2>
-      <p>Nesta secção pode selecionar e adicionar alunos à pauta atual, permitindo associar os respetivos registos de avaliação. Após a inclusão, será possível consultar, editar e guardar as classificações finais diretamente nesta pauta.</p>
-    </div>
-  </div>
+<%- include("../partials/metric-cards", { cards: [
+  { label: "UC", value: sheet.unitId?.name || "-" },
+  { label: "Ano letivo", value: sheet.academicYear || "-" },
+  { label: "Época", value: sheet.season || "-" }
+] }) %>
 
-  <form method="post" action="/funcionario/pautas/<%= sheet._id %>/alunos" class="app-form app-form--grid profile-form" novalidate>
-    <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
-    <div class="app-field profile-form__actions">
-      <label for="student_user_id">Aluno</label>
-      <select id="student_user_id" name="student_user_id">
-        <option value="">Seleciona um aluno</option>
-        <% availableStudents.forEach((student) => { %>
-          <option value="<%= student._id %>"><%= student.name %> · <%= student.email %></option>
-        <% }) %>
-      </select>
+<% if (availableStudents.length) { %>
+  <section class="app-panel">
+    <div class="app-panel__header">
+      <div>
+        <h2>Adicionar alunos elegíveis</h2>
+        <p>Selecione os alunos aprovados que pretende incluir nesta pauta.</p>
+      </div>
     </div>
-    <div class="app-form__actions profile-form__actions">
-      <button type="submit" class="app-button app-button--primary">Adicionar aluno</button>
-    </div>
-  </form>
-</section>
+
+    <form method="post" action="/funcionario/pautas/<%= sheet._id %>/alunos" class="app-form profile-form pautas-detail-form" novalidate>
+      <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+      <div class="app-table-wrap">
+        <table class="app-table app-table--eligible-students">
+          <colgroup>
+            <col class="app-table__select-col">
+            <col class="app-table__name-col">
+            <col class="app-table__email-col">
+          </colgroup>
+          <thead>
+            <tr>
+              <th class="app-table__select-col">Incluir</th>
+              <th class="app-table__name-col">Aluno</th>
+              <th class="app-table__email-col">E-mail</th>
+            </tr>
+          </thead>
+          <tbody>
+            <% availableStudents.forEach((student) => { %>
+              <tr>
+                <td class="app-table__select-col">
+                  <label class="pautas-detail-check">
+                    <input type="checkbox" name="studentUserIds" value="<%= student._id %>">
+                    <span>Selecionar</span>
+                  </label>
+                </td>
+                <td class="app-table__name-col"><div class="app-text-flow--scroll"><%= student.name %></div></td>
+                <td class="app-table__email-col"><div class="app-text-flow--scroll"><%= student.email %></div></td>
+              </tr>
+            <% }) %>
+          </tbody>
+        </table>
+      </div>
+      <div class="app-form__actions profile-form__actions pautas-detail-form__actions">
+        <button type="submit" class="app-button app-button--primary">Adicionar alunos selecionados</button>
+      </div>
+    </form>
+  </section>
+<% } %>
 
 <section class="app-panel">
   <div class="app-panel__header">
     <div>
-      <h2>Gestão das notas</h2>
-      <p>Nesta secção pode editar e guardar as classificações finais dos alunos associados a esta pauta.</p>
+      <h2>Gestão das notas finais</h2>
+      <p>Nesta secção pode editar e guardar as classificações finais dos alunos associados à pauta, garantindo que todas as notas ficam corretamente registadas e atualizadas de forma simples e organizada.</p>
     </div>
   </div>
 
-  <form method="post" action="/funcionario/pautas/<%= sheet._id %>/notas" novalidate>
+  <form method="post" action="/funcionario/pautas/<%= sheet._id %>/notas" class="app-form profile-form pautas-detail-form" novalidate>
     <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
     <div class="app-table-wrap">
-      <table class="app-table">
+      <table class="app-table app-table--grades">
+        <colgroup>
+          <col class="app-table__name-col">
+          <col class="app-table__email-col">
+          <col class="app-table__uc-name-col">
+        </colgroup>
         <thead>
           <tr>
-            <th>Aluno</th>
-            <th>E-mail</th>
-            <th>Nota final</th>
+            <th class="app-table__name-col">Aluno</th>
+            <th class="app-table__email-col">E-mail</th>
+            <th class="app-table__uc-name-col">Nota final</th>
           </tr>
         </thead>
         <tbody>
           <% if (!students.length) { %>
-            <tr><td colspan="3"><p class="empty-text">Ainda não existem alunos associados à pauta.</p></td></tr>
-          <% } %>
-          <% students.forEach((row, index) => { %>
             <tr>
-              <td><%= row.studentUserId?.name || "-" %></td>
-              <td><%= row.studentUserId?.email || "-" %></td>
-              <td>
-                <input type="hidden" name="entries[<%= index %>][id]" value="<%= row._id %>">
-                <input type="number" name="entries[<%= index %>][finalGrade]" value="<%= row.finalGrade ?? "" %>">
+              <td colspan="3"><p class="empty-text">Ainda não existem alunos associados a esta pauta.</p></td>
+            </tr>
+          <% } %>
+          <% students.forEach((row) => { %>
+            <tr>
+              <td class="app-table__name-col"><div class="app-text-flow--scroll"><%= row.studentUserId?.name || "-" %></div></td>
+              <td class="app-table__email-col"><div class="app-text-flow--scroll"><%= row.studentUserId?.email || "-" %></div></td>
+              <td class="app-table__uc-name-col">
+                <input
+                  type="text"
+                  name="grades[<%= row._id %>]"
+                  value="<%= row.finalGrade ?? "" %>"
+                  inputmode="decimal"
+                  placeholder="0-20"
+                >
               </td>
             </tr>
           <% }) %>
@@ -62,7 +103,7 @@
       </table>
     </div>
     <% if (students.length) { %>
-      <div class="app-form__actions profile-form__actions" style="margin-top: 16px;">
+      <div class="app-form__actions profile-form__actions pautas-detail-form__actions">
         <button type="submit" class="app-button app-button--primary">Guardar notas</button>
       </div>
     <% } %>

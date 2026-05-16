@@ -683,8 +683,16 @@ webRouter.get("/funcionario/pautas/:id", requireRole("funcionario"), asyncRoute(
   return res.render("employee/grade-sheet-detail", {
     title: "Gc",
     pageTitle: "Detalhes da Pauta",
-    pageDescription: "Nesta área pode consultar os alunos associados à pauta selecionada e lançar as respetivas notas finais. Também pode editar e guardar as classificações de forma simples, mantendo o processo de avaliação organizado e atualizado.",
+    pageDescription: "Nesta área pode consultar os alunos elegíveis associados à pauta selecionada e lançar as respetivas notas finais. Também pode editar e guardar as classificações de forma simples, mantendo o processo de avaliação organizado e atualizado.",
     activeHref: "/funcionario/pautas",
+    headerActions: [
+      {
+        href: "/funcionario/pautas",
+        label: "Voltar às pautas",
+        class: "app-button--ghost app-button--icon",
+        iconSvg: '<svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor" aria-hidden="true"><path stroke-linecap="round" stroke-linejoin="round" d="M9 15 3 9m0 0 6-6M3 9h12a6 6 0 0 1 0 12h-3" /></svg>'
+      }
+    ],
     sheet,
     students,
     availableStudents
@@ -742,7 +750,9 @@ webRouter.post("/funcionario/pautas/:id/notas", requireRole("funcionario"), asyn
     return res.redirect("/funcionario/pautas");
   }
 
-  const entries = Array.isArray(req.body.entries) ? req.body.entries : Object.values(req.body.entries ?? {});
+  const entries = req.body.grades
+    ? Object.entries(req.body.grades).map(([id, finalGrade]) => ({ id, finalGrade }))
+    : (Array.isArray(req.body.entries) ? req.body.entries : Object.values(req.body.entries ?? {}));
   let changed = 0;
 
   for (const entry of entries) {
