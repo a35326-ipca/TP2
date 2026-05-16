@@ -753,7 +753,7 @@ webRouter.post("/funcionario/pautas/:id/notas", requireRole("funcionario"), asyn
     try {
       finalGrade = parseGrade(entry.finalGrade ?? entry.final_grade);
     } catch (error) {
-      setFlash(req, "error", error.message || "A nota indicada não é válida.");
+      setFlash(req, "error", error.message || "A nota tem de ser de 0 a 20.");
       return res.redirect(`/funcionario/pautas/${sheetId}`);
     }
 

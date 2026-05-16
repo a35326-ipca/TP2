@@ -33,7 +33,7 @@
     </div>
   </div>
 
-  <form method="post" action="/funcionario/pautas/<%= sheet._id %>/notas">
+  <form method="post" action="/funcionario/pautas/<%= sheet._id %>/notas" novalidate>
     <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
     <div class="app-table-wrap">
       <table class="app-table">
@@ -54,7 +54,7 @@
               <td><%= row.studentUserId?.email || "-" %></td>
               <td>
                 <input type="hidden" name="entries[<%= index %>][id]" value="<%= row._id %>">
-                <input type="number" name="entries[<%= index %>][finalGrade]" min="0" max="20" step="0.01" value="<%= row.finalGrade ?? "" %>">
+                <input type="number" name="entries[<%= index %>][finalGrade]" value="<%= row.finalGrade ?? "" %>">
               </td>
             </tr>
           <% }) %>

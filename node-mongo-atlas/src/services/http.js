@@ -70,7 +70,7 @@ export function parseGrade(value) {
   const grade = Number.parseFloat(`${value}`.replace(",", "."));
 
   if (!Number.isFinite(grade) || grade < 0 || grade > 20) {
-    throw createHttpError(422, "A nota final deve estar entre 0 e 20.");
+    throw createHttpError(422, "A nota tem de ser de 0 a 20.");
   }
 
   return Math.round(grade * 100) / 100;
