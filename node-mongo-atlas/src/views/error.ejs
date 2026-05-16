@@ -1,0 +1,28 @@
+<style>
+  body {
+    margin: 0;
+    min-height: 100vh;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(135deg, #f7fbf7 0%, #edf6ee 100%);
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: #172217;
+  }
+  .error-card {
+    width: min(520px, calc(100vw - 32px));
+    padding: 34px;
+    border: 1px solid #d7e4d8;
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.94);
+    box-shadow: 0 24px 60px rgba(19, 39, 22, 0.10);
+  }
+  .error-card h1 { margin: 0 0 10px; }
+  .error-card p { margin: 0 0 20px; color: #617163; line-height: 1.6; }
+  .error-card a { color: #17622e; font-weight: 800; text-decoration: none; }
+</style>
+
+<main class="error-card">
+  <h1><%= title || "Erro" %></h1>
+  <p><%= message || "Não foi possível concluir o pedido." %></p>
+  <a href="/">Voltar ao portal</a>
+</main>

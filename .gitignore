@@ -1,0 +1,12 @@
+﻿node-mongo-atlas/node_modules/
+node-mongo-atlas/.env
+node-mongo-atlas/*.log
+node-mongo-atlas/server.out.log
+node-mongo-atlas/server.err.log
+
+# Uploads reais dos utilizadores não devem ir para o repositório.
+node-mongo-atlas/statics/uploads/**
+!node-mongo-atlas/statics/uploads/
+!node-mongo-atlas/statics/uploads/.gitkeep
+!node-mongo-atlas/statics/uploads/profiles/
+!node-mongo-atlas/statics/uploads/profiles/.gitkeep

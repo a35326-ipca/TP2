@@ -1,0 +1,94 @@
+<%- include("../partials/app-start") %>
+<section class="app-panel">
+  <div class="app-panel__header">
+    <div>
+      <h2>Estado atual</h2>
+      <p><strong>Só poderás aceder à matrícula e às notas depois de preencheres a ficha e de esta ser aprovada.</strong></p>
+      <p><%= profile ? "A tua ficha já existe e podes acompanhar o estado abaixo." : "Ainda não tens ficha criada. Começa por guardar um rascunho." %></p>
+      <p>* = Campos obrigatórios</p>
+    </div>
+  </div>
+
+  <div class="review-profile-grid student-profile-summary-grid">
+    <article class="app-card review-profile-card review-profile-card--details student-profile-summary-card">
+      <h2>Dados submetidos</h2>
+      <div class="review-profile-details">
+        <p><strong>Estado atual:</strong> <span class="app-text-flow"><%- include("../partials/status-badge", { status: profile?.status || "sem ficha" }) %></span></p>
+        <p><strong>Curso:</strong> <span class="app-text-flow--scroll"><%= profile?.courseId?.name || "-" %></span></p>
+        <p><strong>Data de nascimento:</strong> <span class="app-text-flow"><%= formatDate(profile?.birthDate) %></span></p>
+        <p><strong>Morada:</strong> <span class="app-text-flow--scroll"><%= profile?.address || "-" %></span></p>
+        <p><strong>Data de submissão:</strong> <span class="app-text-flow"><%= formatDate(profile?.submittedAt) %></span></p>
+        <p><strong>Observações da análise:</strong> <span class="app-text-flow--scroll"><%= profile?.reviewNotes || "-" %></span></p>
+      </div>
+    </article>
+    <article class="app-card review-profile-card review-profile-card--photo student-profile-summary-card">
+      <h2>Fotografia do aluno</h2>
+      <p class="helper-text">Aqui podes ver a fotografia submetida na tua ficha.</p>
+      <div class="review-profile-photo-wrap">
+        <% if (profile?.photoPath) { %>
+          <img src="<%= assetPath(profile.photoPath) %>" alt="Fotografia do aluno" class="photo-preview photo-preview--modal student-profile-photo-preview">
+        <% } else { %>
+          <p class="empty-text">Ainda não existe fotografia submetida.</p>
+        <% } %>
+      </div>
+    </article>
+  </div>
+</section>
+
+<section class="app-panel">
+  <div class="app-panel__header">
+    <div>
+      <h2><%= editable ? "Editar ficha" : "Ficha bloqueada" %></h2>
+      <p><%= editable ? "Podes guardar um rascunho ou submeter a ficha para validação." : "A ficha só volta a estar editável se ficar em rascunho ou rejeitada." %></p>
+    </div>
+  </div>
+
+  <form method="post" action="/aluno/ficha" enctype="multipart/form-data" class="app-form app-form--grid" novalidate>
+    <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+    <div class="app-field">
+      <label for="course_id">Curso pretendido *</label>
+      <select id="course_id" name="course_id" <%= editable ? "" : "disabled" %>>
+        <option value="">Seleciona um curso</option>
+        <% courses.forEach((course) => { %>
+          <option value="<%= course._id %>" <%= String(profile?.courseId?._id || profile?.courseId || "") === String(course._id) ? "selected" : "" %>><%= course.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="app-field">
+      <label for="full_name">Nome completo *</label>
+      <input id="full_name" type="text" name="full_name" value="<%= profile?.fullName || "" %>" <%= editable ? "" : "disabled" %>>
+    </div>
+    <div class="app-field">
+      <label for="birth_date">Data de nascimento *</label>
+      <input id="birth_date" type="date" name="birth_date" value="<%= formatDate(profile?.birthDate) === "-" ? "" : formatDate(profile?.birthDate) %>" <%= editable ? "" : "disabled" %>>
+    </div>
+    <div class="app-field">
+      <label for="contact_email">E-mail de contacto *</label>
+      <input id="contact_email" type="email" name="contact_email" value="<%= profile?.contactEmail || currentUser.email %>" <%= editable ? "" : "disabled" %>>
+    </div>
+    <div class="app-field">
+      <label for="phone">Telefone *</label>
+      <input id="phone" type="text" name="phone" value="<%= profile?.phone || "" %>" <%= editable ? "" : "disabled" %>>
+    </div>
+    <div class="app-field">
+      <label for="address">Morada *</label>
+      <input id="address" type="text" name="address" value="<%= profile?.address || "" %>" <%= editable ? "" : "disabled" %>>
+    </div>
+    <div class="app-field student-profile-photo-field">
+      <label for="photo">Fotografia (JPG/PNG até 2 MB) *</label>
+      <input id="photo" type="file" name="photo" accept=".jpg,.jpeg,.png" <%= editable ? "" : "disabled" %>>
+    </div>
+    <div class="app-field student-profile-notes-field">
+      <label for="notes">Observações</label>
+      <textarea id="notes" name="notes" <%= editable ? "" : "disabled" %>><%= profile?.notes || "" %></textarea>
+    </div>
+
+    <% if (editable) { %>
+      <div class="app-form__actions profile-form__actions">
+        <button type="submit" name="action" value="save_draft" class="app-button app-button--ghost">Guardar rascunho</button>
+        <button type="submit" name="action" value="submit_profile" class="app-button app-button--primary">Submeter ficha</button>
+      </div>
+    <% } %>
+  </form>
+</section>
+<%- include("../partials/app-end") %>

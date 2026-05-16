@@ -1,0 +1,140 @@
+<%- include("../partials/app-start") %>
+
+<section class="app-panel profile-panel">
+  <div class="app-panel__header">
+    <div>
+      <h2>Criar pauta</h2>
+      <p>Nesta secção pode criar novas pautas de avaliação, bastando preencher os campos abaixo com a Unidade Curricular, o ano letivo e a época pretendida, de forma simples e rápida.</p>
+    </div>
+  </div>
+
+  <form method="post" action="/funcionario/pautas" class="app-form app-form--grid profile-form pautas-form" novalidate>
+    <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+    <input type="hidden" name="action" value="create_sheet">
+
+    <div class="app-field">
+      <label for="unit_id">UC</label>
+      <select id="unit_id" name="unit_id">
+        <option value="">Seleciona uma UC</option>
+        <% units.forEach((unit) => { %>
+          <option value="<%= unit._id %>"><%= unit.name %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="app-field">
+      <label for="academic_year">Ano letivo</label>
+      <input id="academic_year" type="text" name="academic_year" value="<%= filterAcademicYear || "" %>">
+    </div>
+
+    <div class="app-field pautas-form__field--full">
+      <label for="season">Época</label>
+      <select id="season" name="season">
+        <option value="">Seleciona a época</option>
+        <option value="Normal">Normal</option>
+        <option value="Recurso">Recurso</option>
+        <option value="Especial">Especial</option>
+      </select>
+    </div>
+
+    <div class="app-form__actions profile-form__actions pautas-form__actions">
+      <button type="submit" class="app-button app-button--primary">Criar pauta</button>
+    </div>
+  </form>
+</section>
+
+<section class="app-panel profile-panel">
+  <div class="app-panel__header">
+    <div>
+      <h2>Gestão de pautas</h2>
+      <p>Nesta secção pode consultar e gerir todas as pautas já criadas, tendo também a possibilidade de filtrar o histórico por Unidade Curricular, ano letivo e época. Desta forma, consegue encontrar e organizar a informação de forma mais rápida, simples e eficiente.</p>
+    </div>
+  </div>
+
+  <form method="get" action="/funcionario/pautas" class="app-form app-form--grid profile-form pautas-form" novalidate>
+    <div class="app-field">
+      <label for="filter_unit_id">Filtrar por UC</label>
+      <select id="filter_unit_id" name="filter_unit_id">
+        <option value="">Todas</option>
+        <% units.forEach((unit) => { %>
+          <option value="<%= unit._id %>" <%= `${filterUnitId || ""}` === `${unit._id}` ? "selected" : "" %>><%= unit.name %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="app-field">
+      <label for="filter_academic_year">Filtrar por ano letivo</label>
+      <input id="filter_academic_year" type="text" name="filter_academic_year" value="<%= filterAcademicYear || "" %>">
+    </div>
+
+    <div class="app-field pautas-form__field--full">
+      <label for="filter_season">Filtrar por época</label>
+      <select id="filter_season" name="filter_season">
+        <option value="">Todas</option>
+        <% ["Normal", "Recurso", "Especial"].forEach((seasonOption) => { %>
+          <option value="<%= seasonOption %>" <%= filterSeason === seasonOption ? "selected" : "" %>><%= seasonOption %></option>
+        <% }) %>
+      </select>
+    </div>
+
+    <div class="app-form__actions profile-form__actions pautas-form__actions pautas-form__actions--split">
+      <button type="submit" class="app-button app-button--primary">Filtrar</button>
+      <a href="/funcionario/pautas" class="app-link">Limpar filtros</a>
+    </div>
+  </form>
+
+  <div class="app-table-wrap">
+    <table class="app-table app-table--sheets">
+      <colgroup>
+        <col class="app-table__course-name-col">
+        <col class="app-table__course-created-col">
+        <col class="app-table__course-state-col">
+        <col class="app-table__profile-status-col">
+        <col class="app-table__course-created-by-col">
+        <col class="app-table__actions-col">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="app-table__course-name-col">UC</th>
+          <th class="app-table__course-created-col">Ano letivo</th>
+          <th class="app-table__course-state-col">Época</th>
+          <th class="app-table__profile-status-col">Alunos</th>
+          <th class="app-table__course-created-by-col">Criada por</th>
+          <th class="app-table__actions-col">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% if (!sheets.length && hasActiveFilters) { %>
+          <tr>
+            <td colspan="6"><p class="empty-text">Não existem pautas para os filtros selecionados.</p></td>
+          </tr>
+        <% } else if (!sheets.length) { %>
+          <tr>
+            <td colspan="6"><p class="empty-text">Não existem pautas registadas.</p></td>
+          </tr>
+        <% } else { %>
+          <% sheets.forEach((sheet) => { %>
+            <tr>
+              <td class="app-table__course-name-col"><%= sheet.unitId?.name || "-" %></td>
+              <td class="app-table__course-created-col"><%= sheet.academicYear %></td>
+              <td class="app-table__course-state-col"><%= sheet.season %></td>
+              <td class="app-table__profile-status-col"><%= sheet.totalStudents ?? 0 %></td>
+              <td class="app-table__course-created-by-col"><%= sheet.createdBy?.name || "-" %></td>
+              <td class="app-table__actions-col">
+                <div class="table-actions">
+                  <a href="/funcionario/pautas/<%= sheet._id %>" title="Abrir pauta">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                    </svg>
+                  </a>
+                </div>
+              </td>
+            </tr>
+          <% }) %>
+        <% } %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<%- include("../partials/app-end") %>

@@ -1,0 +1,13 @@
+<% if (cards && cards.length) { %>
+  <section class="metric-grid">
+    <% cards.forEach((card) => { %>
+      <article class="metric-card">
+        <span class="metric-card__label"><%= card.label %></span>
+        <strong class="metric-card__value"><%= card.value %></strong>
+        <% if (card.hint) { %>
+          <p class="metric-card__hint"><%= card.hint %></p>
+        <% } %>
+      </article>
+    <% }) %>
+  </section>
+<% } %>

@@ -1,0 +1,66 @@
+<%- include("../partials/app-start") %>
+<section class="app-panel">
+  <div class="app-panel__header">
+    <div>
+      <h2>Novo pedido</h2>
+      <p>Nesta secção podes selecionar um curso disponível e criar um novo pedido de matrícula. Também podes acrescentar observações, se necessário, para fornecer informações adicionais ao funcionário durante a análise do pedido.</p>
+    </div>
+  </div>
+  <form method="post" action="/aluno/matriculas" class="app-form app-form--grid profile-form student-enrollment-form" novalidate>
+    <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+    <div class="app-field student-enrollment-form__field-full">
+      <label for="course_id">Curso</label>
+      <select id="course_id" name="course_id" required>
+        <option value="">Seleciona um curso</option>
+        <% courses.forEach((course) => { %>
+          <option value="<%= course._id %>"><%= course.name %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="app-field student-enrollment-form__field-full">
+      <label for="student_notes">Observações do aluno</label>
+      <textarea id="student_notes" name="student_notes"></textarea>
+    </div>
+    <div class="app-form__actions profile-form__actions">
+      <button type="submit" class="app-button app-button--primary">Criar pedido</button>
+    </div>
+  </form>
+</section>
+
+<section class="app-panel">
+  <div class="app-panel__header">
+    <div>
+      <h2>Histórico de pedidos</h2>
+      <p>Nesta secção podes consultar o histórico de todos os pedidos de matrícula realizados, verificar o estado atual de cada um e acompanhar as decisões mais recentes associadas a cada pedido.</p>
+    </div>
+  </div>
+  <div class="app-table-wrap">
+    <table class="app-table app-table--student-requests">
+      <colgroup>
+        <col>
+        <col>
+        <col class="app-table__student-request-decision-col">
+        <col class="app-table__student-request-created-col">
+        <col class="app-table__student-request-status-col">
+      </colgroup>
+      <thead>
+        <tr><th>Curso</th><th>Notas do aluno</th><th>Decisão</th><th class="app-table__student-request-created-col">Criado em</th><th class="app-table__student-request-status-col">Estado</th></tr>
+      </thead>
+      <tbody>
+        <% if (!requests.length) { %>
+          <tr><td colspan="5"><p class="empty-text">Ainda não tens pedidos de matrícula.</p></td></tr>
+        <% } %>
+        <% requests.forEach((request) => { %>
+          <tr>
+            <td><div class="app-text-flow--scroll"><%= request.courseId?.name || "-" %></div></td>
+            <td><div class="app-text-flow--scroll"><%= request.studentNotes || "-" %></div></td>
+            <td class="app-table__student-request-decision-col"><div class="app-text-flow--scroll"><%= request.decisionNotes || "-" %></div><div class="app-text-flow--scroll helper-text"><%= request.decidedBy?.name || "-" %></div></td>
+            <td class="app-table__student-request-created-col"><%= formatDate(request.createdAt) %></td>
+            <td class="app-table__student-request-status-col"><%- include("../partials/status-badge", { status: request.status }) %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</section>
+<%- include("../partials/app-end") %>

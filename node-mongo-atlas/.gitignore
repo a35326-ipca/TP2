@@ -1,0 +1,11 @@
+node_modules/
+.env
+*.log
+server.out.log
+server.err.log
+
+# Uploads reais dos utilizadores não devem ir para o repositório.
+statics/uploads/*
+!statics/uploads/.gitkeep
+!statics/uploads/profiles/
+!statics/uploads/profiles/.gitkeep

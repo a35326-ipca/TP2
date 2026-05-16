@@ -1,0 +1,1874 @@
+/* Variáveis globais de cor, superfícies e sombras da interface. */
+:root {
+    --app-text: #172217;
+    --app-muted: #617163;
+    --app-line: #d7e4d8;
+    --app-surface: rgba(255, 255, 255, 0.96);
+    --app-surface-soft: rgba(249, 252, 249, 0.98);
+    --app-green: #1f7a39;
+    --app-green-dark: #17622e;
+    --app-green-soft: #e8f7ec;
+    --app-red: #e02424;
+    --app-red-soft: #fff0f0;
+    --app-amber: #a16207;
+    --app-amber-soft: #fff7dd;
+    --app-shadow: 0 24px 60px rgba(19, 39, 22, 0.08);
+    --app-dock-shadow: 0 28px 60px rgba(15, 23, 42, 0.16);
+}
+
+/* Regras base comuns a toda a aplicação. */
+* {
+    box-sizing: border-box;
+}
+
+.app-body {
+    margin: 0;
+    min-height: 100vh;
+    font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+    color: var(--app-text);
+    background:
+        radial-gradient(circle at top left, rgba(255, 255, 255, 0.92) 0%, rgba(238, 246, 238, 0.9) 45%, rgba(228, 239, 228, 0.98) 100%),
+        linear-gradient(135deg, #f7fbf7 0%, #edf6ee 100%);
+}
+
+.app-body.app-modal-open {
+    overflow: hidden;
+}
+
+/* Estrutura principal da aplicação autenticada. */
+.app-shell {
+    min-height: 100vh;
+    padding: 28px 28px 28px 126px;
+}
+
+/* Navegação lateral ou inferior da aplicação, conforme o tamanho do ecrã. */
+.app-dock {
+    position: fixed;
+    top: 50%;
+    left: 20px;
+    transform: translateY(-50%);
+    z-index: 20;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 14px;
+    padding: 18px 12px;
+    width: 86px;
+    border: 1px solid rgba(214, 228, 216, 0.95);
+    border-radius: 30px;
+    background: rgba(255, 255, 255, 0.84);
+    backdrop-filter: blur(18px);
+    box-shadow: var(--app-dock-shadow);
+    transform-style: preserve-3d;
+    backface-visibility: hidden;
+}
+
+.app-dock__brand {
+    display: none;
+}
+
+.app-dock__nav {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+    width: 100%;
+}
+
+.app-dock__link {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 100%;
+    height: 54px;
+    border-radius: 18px;
+    color: var(--app-green-dark);
+    background: rgba(244, 250, 245, 0.94);
+    border: 1px solid transparent;
+    text-decoration: none;
+    transform: translateZ(0);
+    transform-origin: center center;
+    will-change: transform, box-shadow;
+    backface-visibility: hidden;
+    transition:
+        transform 160ms cubic-bezier(0.22, 1, 0.36, 1),
+        background 160ms cubic-bezier(0.22, 1, 0.36, 1),
+        border-color 160ms cubic-bezier(0.22, 1, 0.36, 1),
+        box-shadow 160ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.app-dock__link:hover,
+.app-dock__link:focus-visible {
+    transform: translateZ(0) scale(1.015);
+    background: rgba(232, 247, 236, 0.98);
+    border-color: rgba(143, 190, 154, 0.6);
+    box-shadow: 0 6px 14px rgba(31, 122, 57, 0.07);
+    outline: none;
+}
+
+.app-dock__link.is-active {
+    background: linear-gradient(160deg, #1f7a39 0%, #2aa24d 100%);
+    color: #fff;
+    box-shadow: 0 8px 16px rgba(31, 122, 57, 0.16);
+}
+
+.app-dock__link svg {
+    width: 22px;
+    height: 22px;
+}
+
+.app-dock__link span {
+    position: absolute;
+    left: calc(100% + 22px);
+    top: 50%;
+    transform: translateY(-50%) translateZ(0);
+    padding: 8px 12px;
+    border-radius: 12px;
+    background: rgba(18, 33, 20, 0.92);
+    color: #fff;
+    font-size: 13px;
+    font-weight: 700;
+    white-space: nowrap;
+    opacity: 0;
+    pointer-events: none;
+    will-change: opacity, transform;
+    backface-visibility: hidden;
+    transition:
+        opacity 140ms cubic-bezier(0.22, 1, 0.36, 1),
+        transform 140ms cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.app-dock__link:hover span,
+.app-dock__link:focus-visible span {
+    opacity: 1;
+    transform: translateY(-50%) translateZ(0);
+}
+
+.app-dock__link--logout {
+    margin-top: 4px;
+    background: linear-gradient(160deg, #ff2d20 0%, #ff4b3a 100%);
+    color: #fff;
+    border-color: rgba(255, 69, 58, 0.28);
+}
+
+.app-dock__link--logout:hover,
+.app-dock__link--logout:focus-visible {
+    transform: translateZ(0) scale(1.015);
+    background: linear-gradient(160deg, #ff2d20 0%, #ff4b3a 100%);
+    color: #fff;
+    border-color: rgba(255, 69, 58, 0.28);
+    box-shadow: 0 6px 14px rgba(255, 45, 32, 0.16);
+}
+
+/* Cabeçalho global e ações principais de cada página. */
+.app-main {
+    width: min(1200px, 100%);
+    margin: 0 auto;
+}
+
+.app-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 20px;
+    padding: 20px 24px;
+    border: 1px solid var(--app-line);
+    border-radius: 28px;
+    background: rgba(255, 255, 255, 0.78);
+    box-shadow: none;
+    backdrop-filter: blur(14px);
+    transition: transform 0.24s ease, box-shadow 0.24s ease;
+}
+
+.app-header:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 10px rgba(21, 41, 24, 0.08);
+}
+
+.app-header h1 {
+    margin: 0 0 8px;
+    font-size: clamp(1.45rem, 1vw + 1.12rem, 2rem);
+    letter-spacing: -0.03em;
+}
+
+.app-header p {
+    margin: 0;
+    color: var(--app-muted);
+    line-height: 1.7;
+}
+
+.app-header__eyebrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    margin-bottom: 10px;
+    padding: 6px 11px;
+    border-radius: 999px;
+    background: var(--app-green-soft);
+    color: var(--app-green-dark);
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+}
+
+.app-header__actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.app-content {
+    display: grid;
+    gap: 20px;
+}
+
+/* Botões e ligações com aspeto de ação. */
+.app-button,
+.app-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    min-height: 44px;
+    padding: 10px 16px;
+    border: 1px solid transparent;
+    border-radius: 14px;
+    font: inherit;
+    font-weight: 700;
+    text-decoration: none;
+    cursor: pointer;
+    transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
+}
+
+.app-button:hover,
+.app-link:hover {
+    transform: translateY(-1px);
+}
+
+.app-button svg,
+.app-link svg {
+    width: 20px;
+    height: 20px;
+    flex: 0 0 auto;
+}
+
+.app-button--primary {
+    background: linear-gradient(160deg, #1f7a39 0%, #2aa24d 100%);
+    color: #fff;
+    border-color: rgba(31, 122, 57, 0.22);
+    box-shadow: 0 4px 10px rgba(31, 122, 57, 0.08);
+}
+
+.app-button--primary:hover {
+    transform: translateY(-2px);
+}
+
+.app-button--danger {
+    background: #dc2626;
+    color: #fff;
+}
+
+.app-button--ghost,
+.app-link {
+    background: #f4faf5;
+    color: var(--app-green-dark);
+    border-color: var(--app-line);
+}
+
+.app-button--icon {
+    width: 52px;
+    min-width: 52px;
+    padding: 0;
+}
+
+/* Cartões, métricas, painéis e blocos do hub. */
+.metric-grid,
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 18px;
+}
+
+.metric-card,
+.app-panel,
+.app-card {
+    border: 1px solid var(--app-line);
+    border-radius: 26px;
+    background: var(--app-surface);
+    box-shadow: none;
+    transition: transform 0.14s ease, box-shadow 0.14s ease;
+}
+
+.metric-card:hover,
+.app-card:hover,
+.app-panel:not(.app-modal__dialog):hover {
+    transform: translateY(-4px);
+    box-shadow: 0 4px 10px rgba(21, 41, 24, 0.08);
+}
+
+.metric-card {
+    padding: 22px;
+    text-align: center;
+}
+
+.metric-card__label {
+    display: block;
+    color: var(--app-muted);
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.metric-card__value {
+    display: block;
+    margin-top: 12px;
+    font-size: 2rem;
+    letter-spacing: -0.03em;
+}
+
+.metric-card__hint {
+    margin: 10px 0 0;
+    color: var(--app-muted);
+    line-height: 1.6;
+}
+
+.app-card {
+    padding: 22px;
+}
+
+.app-card input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin-bottom: 14px;
+}
+
+.app-card h2,
+.app-panel h2 {
+    margin: 0 0 8px;
+    font-size: 1.4rem;
+    letter-spacing: -0.03em;
+}
+
+.app-card p,
+.app-panel p,
+.app-panel li {
+    color: var(--app-muted);
+    line-height: 1.7;
+}
+
+.app-card__actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-top: 18px;
+}
+
+.hub-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 20px;
+    align-items: stretch;
+}
+
+.hub-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 228px;
+    padding: 24px;
+}
+
+.hub-card__body {
+    display: grid;
+    gap: 8px;
+    flex: 1;
+}
+
+.hub-card__body p {
+    margin: 0;
+}
+
+.hub-card h2 {
+    margin-bottom: 2px;
+}
+
+.hub-card__actions {
+    display: grid;
+    gap: 12px;
+    margin-top: auto;
+    padding-top: 12px;
+}
+
+.hub-card__actions .app-link,
+.hub-card__actions .app-button {
+    width: 100%;
+    justify-content: center;
+    padding-inline: 20px;
+    border-radius: 18px;
+}
+
+.hub-grid--compact .hub-card {
+    min-height: 0;
+}
+
+.hub-card--compact {
+    padding: 22px;
+}
+
+.hub-card--compact .hub-card__body {
+    gap: 6px;
+}
+
+.hub-card--compact h2 {
+    margin-bottom: 0;
+}
+
+.hub-card--compact .hub-card__actions {
+    gap: 10px;
+    padding-top: 10px;
+}
+
+.hub-card--full {
+    grid-column: 1 / -1;
+}
+
+.hub-card--centered .hub-card__body,
+.hub-card--centered h2,
+.hub-card--centered .hub-card__body p {
+    text-align: center;
+}
+
+.hub-card--full.hub-card--centered .hub-card__body {
+    flex: 1;
+    gap: 6px;
+}
+
+.hub-card--full.hub-card--centered h2 {
+    margin: 0 0 2px;
+}
+
+.hub-card--full.hub-card--centered .hub-card__actions {
+    padding-top: 8px;
+    margin-top: 0;
+}
+
+.hub-card--full.hub-card--centered .hub-card__body p {
+    margin: 0;
+}
+
+.hub-card--full.hub-card--centered .hub-card__body p {
+    margin-top: 0;
+}
+
+.hub-card--full.hub-card--centered {
+    min-height: 0;
+    padding-top: 18px;
+    padding-bottom: 18px;
+}
+
+.app-panel {
+    padding: 24px;
+}
+
+/* Cabeçalho interno dos painéis de conteúdo. */
+.app-panel__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 14px;
+    margin-bottom: 18px;
+}
+
+.profile-panel {
+    padding: 22px;
+}
+
+.profile-panel .app-panel__header {
+    margin-bottom: 10px;
+}
+
+.profile-form {
+    gap: 10px;
+}
+
+.profile-form__actions {
+    width: 100%;
+    grid-column: 1 / -1;
+}
+
+.profile-form__actions .app-button {
+    width: 100%;
+    justify-content: center;
+}
+
+.profile-form__actions .app-link {
+    width: 100%;
+    justify-content: center;
+}
+
+.pautas-form__actions {
+    align-items: stretch;
+}
+
+.pautas-form__actions--split {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.pautas-form__actions--split .app-button,
+.pautas-form__actions--split .app-link {
+    width: 100%;
+    justify-content: center;
+}
+
+.pautas-form__field--full {
+    grid-column: 1 / -1;
+}
+
+.pautas-form + .app-table-wrap {
+    margin-top: 18px;
+}
+
+.pautas-detail-form {
+    gap: 18px;
+}
+
+.pautas-detail-form__actions {
+    margin-top: 4px;
+}
+
+.pautas-detail-check {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    font-weight: 600;
+    color: var(--app-green-dark);
+    cursor: pointer;
+}
+
+.pautas-detail-check input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    margin: 0;
+}
+
+/* Modais reutilizáveis da interface. */
+.app-modal {
+    position: fixed;
+    inset: 0;
+    z-index: 80;
+    display: grid;
+    place-items: center;
+    padding: 28px;
+}
+
+.app-modal__backdrop {
+    position: absolute;
+    inset: 0;
+    background: rgba(12, 20, 14, 0.36);
+    backdrop-filter: blur(6px);
+}
+
+.app-modal__dialog {
+    position: relative;
+    z-index: 1;
+    width: min(760px, 100%);
+    max-height: min(88vh, 920px);
+    overflow: auto;
+    box-shadow: 0 26px 60px rgba(15, 23, 18, 0.16);
+}
+
+.app-modal__dialog--compact {
+    width: min(560px, 100%);
+}
+
+.app-modal__dialog--wide {
+    width: min(1180px, 100%);
+}
+
+.app-modal__dialog--review {
+    width: min(1700px, 100%);
+}
+
+.app-modal__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 16px;
+    margin-bottom: 12px;
+}
+
+.app-modal__header p {
+    margin: 0;
+}
+
+.app-modal__close {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 50px;
+    height: 50px;
+    min-width: 50px;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: #7a867a;
+    text-decoration: none;
+}
+
+.app-modal__close svg {
+    width: 22px;
+    height: 22px;
+}
+
+.app-modal__content {
+    display: grid;
+    gap: 2px;
+    margin-bottom: 14px;
+}
+
+.app-modal__content p {
+    margin: 0;
+}
+
+.app-modal__actions {
+    justify-content: flex-end;
+}
+
+.app-modal__actions .app-link,
+.app-modal__actions .app-button {
+    width: auto;
+    min-width: 172px;
+}
+
+.app-modal__actions--single {
+    justify-content: center;
+}
+
+.app-modal__actions--single .app-button {
+    width: 100%;
+    min-width: 0;
+    justify-content: center;
+}
+
+
+/* Formulários e campos de introdução de dados. */
+.app-form {
+    display: grid;
+    gap: 14px;
+}
+
+.app-form--grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+}
+
+.app-field label {
+    display: block;
+    margin-bottom: 6px;
+    font-size: 14px;
+    font-weight: 700;
+}
+
+.app-field input,
+.app-field select,
+.app-field textarea {
+    min-width: 0;
+    width: 100%;
+    padding: 12px 14px;
+    border: 1px solid #c6d8c8;
+    border-radius: 14px;
+    background: #fff;
+    color: var(--app-text);
+    font: inherit;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.password-field {
+    position: relative;
+}
+
+.password-field input {
+    padding-right: 52px;
+}
+
+.password-field input[type="password"]::-ms-reveal,
+.password-field input[type="password"]::-ms-clear {
+    display: none;
+}
+
+.toggle-password {
+    position: absolute;
+    top: 50%;
+    right: 14px;
+    transform: translateY(-50%);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 28px;
+    height: 28px;
+    border: 0;
+    padding: 0;
+    background: transparent;
+    color: #607060;
+    cursor: pointer;
+}
+
+.toggle-password:hover {
+    color: #1f7a39;
+}
+
+.toggle-password svg {
+    width: 18px;
+    height: 18px;
+}
+
+.app-field textarea {
+    min-height: 120px;
+    resize: vertical;
+    white-space: pre-wrap;
+}
+
+.app-field input:focus,
+.app-field select:focus,
+.app-field textarea:focus {
+    outline: none;
+    border-color: #8ab898;
+}
+
+.app-form__actions {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+/* Tabelas administrativas e tabelas de consulta do aluno. */
+.app-table-wrap {
+    margin-top: 0;
+    overflow-x: auto;
+    border: 1px solid var(--app-line);
+    border-radius: 22px;
+    background: #fff;
+}
+
+.app-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.app-table__col-name {
+    width: 29%;
+}
+
+.app-table__col-email {
+    width: 29%;
+}
+
+.app-table__col-role {
+    width: 16%;
+}
+
+.app-table__col-date {
+    width: 13%;
+}
+
+.app-table__col-actions {
+    width: 6%;
+}
+
+.app-table__select-col {
+    width: 14%;
+}
+
+.app-table__course-name-col {
+    width: 43%;
+}
+
+.app-table__course-state-col {
+    width: 11%;
+}
+
+.app-table__course-created-col {
+    width: 14%;
+}
+
+.app-table__course-updated-col {
+    width: 14%;
+}
+
+.app-table__course-created-by-col {
+    width: 8%;
+}
+
+.app-table__course-actions-col {
+    width: 6%;
+}
+
+.app-table__uc-name-col {
+    width: 47%;
+}
+
+.app-table__uc-created-col {
+    width: 18%;
+}
+
+.app-table__uc-updated-col {
+    width: 18%;
+}
+
+.app-table__uc-actions-col {
+    width: 7%;
+}
+
+.app-table__plan-course-col {
+    width: 36%;
+}
+
+.app-table__plan-unit-col {
+    width: 34%;
+}
+
+.app-table__plan-year-col {
+    width: 8%;
+}
+
+.app-table__plan-semester-col {
+    width: 10%;
+}
+
+.app-table__plan-actions-col {
+    width: 8%;
+}
+
+.app-table--eligible-students th.app-table__select-col,
+.app-table--eligible-students td.app-table__select-col {
+    text-align: center;
+    white-space: nowrap;
+}
+
+.app-table th,
+.app-table td {
+    padding: 14px 16px;
+    border-bottom: 1px solid #e7efe7;
+    text-align: left;
+    vertical-align: middle;
+}
+
+.app-table th {
+    background: #f6fbf7;
+    color: var(--app-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: 12px;
+}
+
+.app-table tr:last-child td {
+    border-bottom: 0;
+}
+
+.app-table tbody tr:hover {
+    background: #fbfefb;
+}
+
+.app-table input[type="text"],
+.app-table input[type="number"] {
+    width: 100%;
+    min-width: 100px;
+    padding: 10px 12px;
+    border: 1px solid #c6d8c8;
+    border-radius: 12px;
+    font: inherit;
+}
+
+.app-table input[type="text"]:hover,
+.app-table input[type="number"]:hover,
+.app-table input[type="text"]:focus,
+.app-table input[type="number"]:focus {
+    outline: none;
+    border-color: #8ab898;
+    box-shadow: 0 0 0 1px rgba(138, 184, 152, 0.18);
+}
+
+.table-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: nowrap;
+    justify-content: center;
+    align-items: center;
+}
+
+.table-actions a,
+.table-actions button {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--app-line);
+    border-radius: 12px;
+    background: #f6fbf7;
+    color: var(--app-green-dark);
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.table-actions .danger {
+    background: linear-gradient(160deg, #ff2d20 0%, #ff4b3a 100%);
+    border-color: rgba(255, 69, 58, 0.28);
+    color: #fff;
+}
+
+.table-actions svg {
+    width: 18px;
+    height: 18px;
+}
+
+.app-table__name-col,
+.app-table__email-col {
+    text-align: left;
+}
+
+.app-table__role-col,
+.app-table__date-col {
+    text-align: right;
+}
+
+.app-table__course-name-col {
+    text-align: left;
+}
+
+.app-table__course-state-col,
+.app-table__course-created-col,
+.app-table__course-updated-col {
+    text-align: right;
+}
+
+.app-table__course-created-by-col {
+    text-align: right;
+}
+
+.app-table__uc-name-col {
+    text-align: left;
+}
+
+.app-table__uc-created-col,
+.app-table__uc-updated-col {
+    text-align: right;
+}
+
+.app-table__plan-course-col,
+.app-table__plan-unit-col {
+    text-align: left;
+}
+
+.app-table__plan-year-col,
+.app-table__plan-semester-col {
+    text-align: right;
+}
+
+.app-table__actions-col {
+    width: 1%;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.app-table__course-actions-col {
+    width: 1%;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.app-table__uc-actions-col {
+    width: 1%;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.app-table__plan-actions-col {
+    width: 1%;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.app-table th.app-table__actions-col,
+.app-table th.app-table__course-actions-col {
+    text-align: center;
+}
+
+.app-table th.app-table__uc-actions-col {
+    text-align: center;
+}
+
+.app-table th.app-table__plan-actions-col {
+    text-align: center;
+}
+
+.app-table th.app-table__date-col,
+.app-table td.app-table__date-col {
+    padding-right: 10px;
+}
+
+.app-table th.app-table__actions-col,
+.app-table td.app-table__actions-col {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.app-table th.app-table__course-state-col,
+.app-table td.app-table__course-state-col,
+.app-table th.app-table__course-created-col,
+.app-table td.app-table__course-created-col,
+.app-table th.app-table__course-updated-col,
+.app-table td.app-table__course-updated-col {
+    padding-left: 12px;
+    padding-right: 10px;
+}
+
+.app-table th.app-table__course-created-by-col,
+.app-table td.app-table__course-created-by-col {
+    padding-left: 16px;
+    padding-right: 6px;
+}
+
+.app-table th.app-table__course-actions-col,
+.app-table td.app-table__course-actions-col {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.app-table th.app-table__uc-created-col,
+.app-table td.app-table__uc-created-col,
+.app-table th.app-table__uc-updated-col,
+.app-table td.app-table__uc-updated-col {
+    padding-left: 14px;
+    padding-right: 10px;
+}
+
+.app-table th.app-table__uc-actions-col,
+.app-table td.app-table__uc-actions-col {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.app-table th.app-table__plan-year-col,
+.app-table td.app-table__plan-year-col,
+.app-table th.app-table__plan-semester-col,
+.app-table td.app-table__plan-semester-col {
+    padding-left: 12px;
+    padding-right: 10px;
+}
+
+.app-table--student-grades th.app-table__course-created-col,
+.app-table--student-grades td.app-table__course-created-col,
+.app-table--student-grades th.app-table__plan-semester-col,
+.app-table--student-grades td.app-table__plan-semester-col,
+.app-table--student-grades th.app-table__course-state-col,
+.app-table--student-grades td.app-table__course-state-col {
+    text-align: center;
+}
+
+.app-table th.app-table__plan-actions-col,
+.app-table td.app-table__plan-actions-col {
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.app-table th.app-table__profile-course-col,
+.app-table td.app-table__profile-course-col {
+    padding-left: 12px;
+    padding-right: 10px;
+}
+
+.app-table th.app-table__profile-phone-col,
+.app-table td.app-table__profile-phone-col {
+    padding-left: 12px;
+    padding-right: 10px;
+}
+
+.app-table th.app-table__profile-submitted-col,
+.app-table td.app-table__profile-submitted-col {
+    width: 1%;
+    white-space: nowrap;
+    padding-left: 10px;
+    padding-right: 8px;
+    text-align: right;
+}
+
+.app-table th.app-table__profile-status-col,
+.app-table td.app-table__profile-status-col {
+    width: 1%;
+    white-space: nowrap;
+    padding-left: 10px;
+    padding-right: 8px;
+    text-align: center;
+}
+
+.app-table th.app-table__profile-actions-col,
+.app-table td.app-table__profile-actions-col {
+    width: 1%;
+    white-space: nowrap;
+    text-align: center;
+    padding-left: 10px;
+    padding-right: 10px;
+}
+
+.status-badge {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 30px;
+    padding: 0 12px;
+    border-radius: 999px;
+    font-size: 12px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+}
+
+.status-badge--success {
+    background: var(--app-green-soft);
+    color: var(--app-green-dark);
+}
+
+.status-badge--danger {
+    background: var(--app-red-soft);
+    color: var(--app-red);
+}
+
+.status-badge--warning {
+    background: var(--app-amber-soft);
+    color: var(--app-amber);
+}
+
+.status-badge--neutral {
+    background: #eff3ef;
+    color: #536353;
+}
+
+.helper-text,
+.empty-text {
+    color: var(--app-muted);
+    line-height: 1.6;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.empty-text {
+    margin: 0;
+    font-style: italic;
+}
+
+.app-table td .empty-text {
+    text-align: center;
+}
+
+.app-table__student-request-decision-col {
+    width: 24%;
+}
+
+.app-table__student-request-status-col {
+    width: 1%;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.app-table__student-request-created-col {
+    width: 1%;
+    white-space: nowrap;
+    text-align: center;
+}
+
+.app-table th.app-table__student-request-status-col,
+.app-table td.app-table__student-request-status-col {
+    text-align: center;
+    padding-left: 12px;
+    padding-right: 12px;
+}
+
+.app-table td.app-table__student-request-status-col .status-badge {
+    display: flex;
+    width: max-content;
+    margin: 0 auto;
+}
+
+.app-table--student-requests th:nth-child(3),
+.app-table--student-requests td.app-table__student-request-decision-col {
+    padding-right: 10px;
+}
+
+.app-table th.app-table__student-request-created-col,
+.app-table td.app-table__student-request-created-col {
+    padding-left: 10px;
+    padding-right: 14px;
+}
+
+.app-table__cell-scroll {
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    white-space: pre-wrap;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    scrollbar-width: thin;
+}
+
+/* Utilitários de leitura, separadores e pré-visualização de imagens. */
+.app-text-flow {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.app-text-flow--scroll {
+    display: block;
+    min-width: 0;
+    max-width: 100%;
+    overflow-x: auto;
+    overflow-y: auto;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+    white-space: pre-wrap;
+    scrollbar-width: thin;
+}
+
+.app-divider {
+    height: 1px;
+    margin: 22px 0;
+    background: linear-gradient(90deg, transparent 0%, #d6e4d7 12%, #d6e4d7 88%, transparent 100%);
+}
+
+.photo-preview {
+    width: 120px;
+    height: 120px;
+    border-radius: 24px;
+    object-fit: cover;
+    border: 1px solid var(--app-line);
+    background: #f8fbf8;
+}
+
+.photo-preview.is-hidden {
+    display: none;
+}
+
+.app-modal__dialog--review .app-modal__header p {
+    display: none;
+}
+
+.photo-preview--modal {
+    width: 100%;
+    max-width: 100%;
+    height: clamp(455px, 40vw, 555px);
+    border-radius: 28px;
+    object-fit: cover;
+    object-position: center;
+    background: #f7faf7;
+}
+
+.photo-placeholder {
+    display: none;
+    align-items: center;
+    justify-content: center;
+    width: 120px;
+    height: 120px;
+    border: 1px solid var(--app-line);
+    border-radius: 24px;
+    background: linear-gradient(180deg, #f6f8f6 0%, #eef3ee 100%);
+    color: #687568;
+}
+
+.photo-placeholder.is-visible {
+    display: flex;
+}
+
+.photo-placeholder--modal {
+    width: 100%;
+    max-width: 100%;
+    height: clamp(455px, 40vw, 555px);
+    border-radius: 28px;
+}
+
+.photo-placeholder__initial {
+    font-size: clamp(3rem, 8vw, 5rem);
+    font-weight: 700;
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: 0;
+}
+
+/* Componentes de revisão, resumo da ficha e histórico de decisões. */
+.review-profile-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 22px;
+    align-items: stretch;
+}
+
+.review-profile-card {
+    display: flex;
+    flex-direction: column;
+    min-height: 680px;
+}
+
+.review-profile-card--history {
+    grid-column: 1 / -1;
+    min-height: 0;
+}
+
+.review-profile-card h2 {
+    margin-bottom: 18px;
+}
+
+.app-modal__dialog--review .app-modal__header {
+    align-items: center;
+    margin-bottom: 18px;
+    min-width: 0;
+}
+
+.app-modal__dialog--review .app-modal__header h2 {
+    margin: 0;
+    min-width: 0;
+    overflow-wrap: anywhere;
+    word-break: break-word;
+}
+
+.review-profile-card--details .photo-preview {
+    display: none;
+}
+
+.review-profile-details {
+    display: grid;
+    gap: 0;
+    margin-top: 0;
+    min-width: 0;
+}
+
+.review-profile-details p {
+    display: grid;
+    grid-template-columns: max-content minmax(0, 1fr);
+    align-items: start;
+    column-gap: 6px;
+    margin: 0;
+    padding: 6px 0;
+    border-bottom: 1px solid rgba(141, 173, 152, 0.26);
+    min-width: 0;
+}
+
+.review-profile-details p:last-child {
+    padding-bottom: 0;
+    border-bottom: 0;
+}
+
+.review-profile-details strong {
+    display: block;
+    min-width: 0;
+}
+
+.review-field--stacked {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    row-gap: 6px;
+    align-items: start !important;
+}
+
+.review-field--stacked strong,
+.review-field--stacked .app-text-flow,
+.review-field--stacked .app-text-flow--scroll {
+    min-width: 0;
+}
+
+.review-profile-card--photo {
+    text-align: center;
+}
+
+.review-profile-card--photo .helper-text {
+    margin: 0 0 12px;
+}
+
+.review-profile-photo-wrap {
+    display: flex;
+    align-items: stretch;
+    justify-content: center;
+    flex: 1;
+    width: 100%;
+    min-width: 0;
+}
+
+.student-profile-summary-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+    align-items: stretch;
+}
+
+.student-profile-summary-card {
+    min-height: 0;
+    height: 100%;
+    min-height: 560px;
+    padding: 20px 22px;
+}
+
+.student-profile-summary-card .review-profile-details {
+    flex: 1;
+    align-content: start;
+}
+
+.student-profile-summary-card.review-profile-card h2 {
+    margin-bottom: 14px;
+}
+
+.student-profile-summary-card .review-profile-details p {
+    padding: 6px 0;
+}
+
+.student-profile-summary-card.review-profile-card--photo {
+    text-align: center;
+}
+
+.student-profile-summary-card .review-profile-photo-wrap {
+    justify-content: center;
+    align-items: center;
+    flex: 1;
+}
+
+.student-profile-summary-card .helper-text {
+    margin: 0 0 10px;
+    text-align: center;
+}
+
+.student-profile-photo-preview {
+    width: 100%;
+    max-width: 100%;
+    height: clamp(320px, 26vw, 430px);
+    border-radius: 24px;
+}
+
+.student-profile-photo-field,
+.student-profile-notes-field {
+    grid-column: 1 / -1;
+}
+
+.student-enrollment-form__field-full {
+    grid-column: 1 / -1;
+}
+
+
+@media (max-width: 980px) {
+    .student-profile-summary-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .student-profile-summary-card .review-profile-photo-wrap {
+        justify-content: center;
+    }
+
+    .student-profile-photo-field,
+    .student-profile-notes-field {
+        grid-column: auto;
+    }
+}
+
+.review-profile-form {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 100%;
+    min-width: 0;
+}
+
+.review-profile-notes-field {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+}
+
+.review-profile-notes {
+    min-height: 320px;
+    height: 100%;
+    resize: none;
+}
+
+.app-field textarea.review-profile-notes {
+    resize: none;
+}
+
+.review-profile-actions {
+    display: grid;
+    gap: 12px;
+    margin-top: auto;
+}
+
+.review-profile-actions .app-button,
+.review-profile-actions .app-link {
+    width: 100%;
+    justify-content: center;
+}
+
+.decision-history {
+    display: grid;
+    gap: 14px;
+    min-width: 0;
+    max-height: 34rem;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.decision-history__item {
+    padding: 16px 18px;
+    border: 1px solid rgba(141, 173, 152, 0.32);
+    border-radius: 18px;
+    background: #f9fcf9;
+    min-width: 0;
+}
+
+.decision-history__item p {
+    margin: 8px 0 0;
+    min-width: 0;
+}
+
+.decision-history__meta {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    color: var(--app-muted);
+    min-width: 0;
+    flex-wrap: wrap;
+}
+
+.review-profile-details .app-text-flow--scroll,
+.decision-history .app-text-flow--scroll {
+    max-height: 10rem;
+}
+
+.review-profile-details {
+    max-height: 34rem;
+    overflow-y: auto;
+    padding-right: 4px;
+}
+
+.app-table td .app-text-flow--scroll,
+.app-table td .app-table__cell-scroll {
+    max-height: 7rem;
+}
+
+/* Lightbox para visualização ampliada de fotografias. */
+.app-photo-lightbox {
+    position: fixed;
+    inset: 0;
+    z-index: 95;
+    display: grid;
+    place-items: center;
+    padding: 28px;
+}
+
+.app-photo-lightbox[hidden] {
+    display: none !important;
+}
+
+.app-photo-lightbox__backdrop {
+    position: absolute;
+    inset: 0;
+    border: 0;
+    background: rgba(8, 14, 10, 0.66);
+    backdrop-filter: blur(8px);
+}
+
+.app-photo-lightbox__dialog {
+    position: relative;
+    z-index: 1;
+    width: min(760px, 100%);
+    padding: 24px;
+    border: 1px solid var(--app-line);
+    border-radius: 28px;
+    background: var(--app-surface);
+    box-shadow: 0 26px 60px rgba(15, 23, 18, 0.22);
+}
+
+.app-photo-lightbox__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    margin-bottom: 18px;
+}
+
+.app-photo-lightbox__header h3 {
+    margin: 0;
+    font-size: 1.35rem;
+}
+
+.app-photo-lightbox__image {
+    display: block;
+    width: 100%;
+    max-height: min(72vh, 820px);
+    object-fit: contain;
+    border-radius: 24px;
+    background: #f8fbf8;
+}
+
+/* Ajustes responsivos para tablets e larguras intermédias. */
+@media (max-width: 980px) {
+    .hub-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .review-profile-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .review-profile-card {
+        min-height: 0;
+    }
+
+    .review-profile-notes {
+        min-height: 220px;
+    }
+
+    .app-shell {
+        padding-left: 28px;
+        padding-bottom: 112px;
+    }
+
+    .app-dock {
+        top: auto;
+        bottom: 18px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: min(92vw, 680px);
+        flex-direction: row;
+        justify-content: space-between;
+        gap: 10px;
+        padding: 12px;
+        border-radius: 28px;
+    }
+
+    .app-dock__brand {
+        display: none;
+    }
+
+    .app-dock__nav {
+        flex-direction: row;
+        justify-content: center;
+        gap: 10px;
+    }
+
+    .app-dock__link {
+        width: 56px;
+        min-width: 56px;
+    }
+
+    .app-dock__link span {
+        display: none;
+    }
+}
+
+/* Ajustes responsivos para telemóveis e ecrãs mais estreitos. */
+@media (max-width: 760px) {
+    .app-shell {
+        padding: 16px 16px 108px;
+    }
+
+    .app-main,
+    .app-content,
+    .app-header,
+    .app-panel,
+    .app-card,
+    .metric-card,
+    .hub-card,
+    .profile-panel {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .app-header > div,
+    .app-panel__header > div,
+    .hub-card__body {
+        min-width: 0;
+        width: 100%;
+    }
+
+    .app-content {
+        gap: 16px;
+    }
+
+    .app-header {
+        flex-direction: column;
+        padding: 18px;
+        border-radius: 24px;
+    }
+
+    .app-header__actions {
+        width: 100%;
+    }
+
+    .app-header__actions .app-button,
+    .app-header__actions .app-link {
+        width: 100%;
+    }
+
+    .metric-grid,
+    .card-grid {
+        grid-template-columns: 1fr;
+        gap: 14px;
+    }
+
+    .metric-card,
+    .app-panel,
+    .app-card,
+    .hub-card,
+    .profile-panel {
+        padding: 18px;
+        border-radius: 22px;
+    }
+
+    .app-panel__header {
+        flex-direction: column;
+        gap: 10px;
+        margin-bottom: 14px;
+    }
+
+    .app-form--grid {
+        grid-template-columns: 1fr;
+    }
+
+    .app-form__actions,
+    .app-modal__actions {
+        flex-direction: column;
+    }
+
+    .app-form__actions .app-button,
+    .app-form__actions .app-link,
+    .app-modal__actions .app-button,
+    .app-modal__actions .app-link {
+        width: 100%;
+        min-width: 0;
+        justify-content: center;
+    }
+
+    .pautas-form__actions--split {
+        grid-template-columns: 1fr;
+    }
+
+    .app-table-wrap {
+        width: 100%;
+        max-width: 100%;
+        border-radius: 18px;
+    }
+
+    .app-table {
+        min-width: 560px;
+    }
+
+    .app-table th,
+    .app-table td {
+        padding: 12px 14px;
+    }
+
+    .app-modal {
+        padding: 16px;
+    }
+
+    .app-modal__dialog,
+    .app-modal__dialog--compact,
+    .app-modal__dialog--wide,
+    .app-modal__dialog--review {
+        width: 100%;
+        max-height: calc(100vh - 32px);
+        border-radius: 24px;
+    }
+
+    .app-modal__header {
+        flex-direction: column;
+    }
+
+    .review-profile-card {
+        min-height: 0;
+    }
+
+    .photo-preview--modal,
+    .student-profile-photo-preview {
+        height: clamp(260px, 58vw, 360px);
+    }
+}
+
+/* Ajustes finais para ecrãs muito pequenos. */
+@media (max-width: 560px) {
+    .app-shell {
+        padding: 12px 12px 104px;
+    }
+
+    .app-header,
+    .metric-card,
+    .app-panel,
+    .app-card,
+    .hub-card,
+    .profile-panel {
+        padding: 16px;
+        border-radius: 20px;
+    }
+
+    .app-header h1 {
+        font-size: 1.9rem;
+    }
+
+    .app-button,
+    .app-link {
+        min-height: 42px;
+        border-radius: 12px;
+    }
+
+    .app-button--icon {
+        width: 44px;
+        min-width: 44px;
+    }
+
+    .app-dock {
+        width: calc(100vw - 24px);
+        bottom: 12px;
+        gap: 8px;
+        padding: 10px;
+        border-radius: 24px;
+    }
+
+    .app-dock__nav {
+        gap: 8px;
+    }
+
+    .app-dock__link {
+        width: 50px;
+        min-width: 50px;
+        height: 50px;
+        border-radius: 16px;
+    }
+
+    .app-table {
+        min-width: 480px;
+    }
+}
+
+.screen-size-lock {
+    display: none;
+}
+
+@media (max-width: 1023px) {
+    .screen-size-lock {
+        position: fixed;
+        inset: 0;
+        z-index: 2147483647;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 24px;
+        background: #000;
+        color: #fff;
+        font-size: 1rem;
+        font-weight: 600;
+        line-height: 1.5;
+        text-align: center;
+    }
+
+    body {
+        overflow: hidden;
+    }
+}

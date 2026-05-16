@@ -1,0 +1,26 @@
+<%- include("../partials/app-start") %>
+<%- include("../partials/metric-cards", { cards }) %>
+
+<section class="hub-grid hub-grid--compact">
+  <article class="app-card hub-card hub-card--compact">
+    <div class="hub-card__body">
+      <h2>Pedidos de matrícula</h2>
+      <p>Área onde é possível analisar os pedidos submetidos pelos alunos, registar decisões e acompanhar o histórico de cada processo de forma organizada.</p>
+    </div>
+    <div class="hub-card__actions">
+      <a href="/funcionario/matriculas" class="app-link">Abrir pedidos</a>
+    </div>
+  </article>
+
+  <article class="app-card hub-card hub-card--compact">
+    <div class="hub-card__body">
+      <h2>Pautas de avaliação</h2>
+      <p>Área que permite criar e gerir pautas por UC, ano letivo e época, facilitando a organização dos alunos e o registo das classificações finais.</p>
+    </div>
+    <div class="hub-card__actions">
+      <a href="/funcionario/pautas" class="app-link">Abrir pautas</a>
+    </div>
+  </article>
+</section>
+
+<%- include("../partials/app-end") %>

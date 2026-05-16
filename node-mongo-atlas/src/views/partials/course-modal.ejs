@@ -1,0 +1,69 @@
+<% if (mode === "edit") { %>
+  <div class="app-modal is-open" id="edit-course-modal">
+    <a href="/gestor/cursos" class="app-modal__backdrop" aria-label="Fechar edição do curso"></a>
+
+    <section class="app-modal__dialog app-panel profile-panel" role="dialog" aria-modal="true" aria-labelledby="edit-course-title">
+      <div class="app-modal__header">
+        <div>
+          <h2 id="edit-course-title">Editar curso</h2>
+          <p>Aqui podes atualizar o nome e o estado do curso selecionado, mantendo a oferta formativa organizada e coerente no sistema.</p>
+        </div>
+        <a href="/gestor/cursos" class="app-modal__close" aria-label="Fechar modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </a>
+      </div>
+
+      <form method="post" action="/gestor/cursos/<%= course._id %>" class="app-form app-form--grid profile-form" novalidate>
+        <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+
+        <div class="app-field">
+          <label for="edit-name">Nome do curso</label>
+          <input id="edit-name" type="text" name="name" value="<%= course.name %>" required>
+        </div>
+        <div class="app-field">
+          <label for="edit-is-active">Estado</label>
+          <select id="edit-is-active" name="is_active">
+            <option value="1" <%= course.isActive ? "selected" : "" %>>Ativo</option>
+            <option value="0" <%= !course.isActive ? "selected" : "" %>>Inativo</option>
+          </select>
+        </div>
+
+        <div class="app-form__actions profile-form__actions">
+          <button type="submit" class="app-button app-button--primary">Guardar curso</button>
+        </div>
+      </form>
+    </section>
+  </div>
+<% } %>
+
+<% if (mode === "delete") { %>
+  <div class="app-modal is-open" id="delete-course-modal">
+    <a href="/gestor/cursos" class="app-modal__backdrop" aria-label="Fechar confirmação de remoção"></a>
+
+    <section class="app-modal__dialog app-panel profile-panel app-modal__dialog--compact" role="dialog" aria-modal="true" aria-labelledby="delete-course-title">
+      <div class="app-modal__header">
+        <div>
+          <h2 id="delete-course-title">Apagar curso</h2>
+          <p>Vais apagar o curso <strong><%= course.name %></strong>. Esta ação remove o registo do curso do sistema.</p>
+        </div>
+        <a href="/gestor/cursos" class="app-modal__close" aria-label="Fechar modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </a>
+      </div>
+
+      <div class="app-modal__content">
+        <p class="helper-text">Estado atual: <strong><%= course.isActive ? "Ativo" : "Inativo" %></strong></p>
+      </div>
+
+      <form method="post" action="/gestor/cursos/<%= course._id %>" class="app-form__actions app-modal__actions app-modal__actions--single">
+        <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+        <input type="hidden" name="intent" value="delete">
+        <button type="submit" class="app-button app-button--danger">Confirmar eliminação</button>
+      </form>
+    </section>
+  </div>
+<% } %>

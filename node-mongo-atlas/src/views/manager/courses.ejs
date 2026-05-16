@@ -1,0 +1,106 @@
+<%- include("../partials/app-start") %>
+
+<section class="app-panel profile-panel">
+  <div class="app-panel__header">
+    <div>
+      <h2>Criar curso</h2>
+      <p>Nesta secção é possível criar novos cursos, preenchendo os campos disponíveis abaixo com as informações necessárias. Após a criação, os cursos ficam disponíveis no sistema para utilização nas diferentes áreas da plataforma. Caso um curso seja marcado como inativo, deixará de aparecer nas áreas destinadas aos alunos.</p>
+    </div>
+  </div>
+
+  <form method="post" action="/gestor/cursos" class="app-form app-form--grid profile-form" novalidate>
+    <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+
+    <div class="app-field">
+      <label for="name">Nome do curso</label>
+      <input id="name" type="text" name="name" value="" required>
+    </div>
+    <div class="app-field">
+      <label for="is_active">Estado</label>
+      <select id="is_active" name="is_active">
+        <option value="1" selected>Ativo</option>
+        <option value="0">Inativo</option>
+      </select>
+    </div>
+
+    <div class="app-form__actions profile-form__actions">
+      <button type="submit" class="app-button app-button--primary">Criar curso</button>
+    </div>
+  </form>
+</section>
+
+<section class="app-panel">
+  <div class="app-panel__header">
+    <div>
+      <h2>Gestão de cursos</h2>
+      <p>Nesta secção é apresentada uma tabela com todos os cursos registados no sistema. A partir desta tabela, é possível gerir cada curso individualmente, permitindo consultar, editar ou atualizar as suas informações sempre que necessário.</p>
+    </div>
+  </div>
+
+  <div class="app-table-wrap">
+    <table class="app-table">
+      <colgroup>
+        <col class="app-table__course-name-col">
+        <col class="app-table__course-state-col">
+        <col class="app-table__course-created-col">
+        <col class="app-table__course-updated-col">
+        <col class="app-table__course-actions-col">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="app-table__course-name-col">Nome</th>
+          <th class="app-table__course-state-col">Estado</th>
+          <th class="app-table__course-created-col">Criado</th>
+          <th class="app-table__course-updated-col">Atualizado</th>
+          <th class="app-table__course-actions-col">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% courses.forEach((course) => { %>
+          <tr>
+            <td class="app-table__course-name-col"><%= course.name %></td>
+            <td class="app-table__course-state-col"><%- include("../partials/status-badge", { status: course.isActive ? "ativo" : "inativo" }) %></td>
+            <td class="app-table__course-created-col"><%= formatDate(course.createdAt) %></td>
+            <td class="app-table__course-updated-col"><%= formatDate(course.updatedAt) %></td>
+            <td class="app-table__course-actions-col">
+              <div class="table-actions">
+                <a href="/gestor/cursos?edit=<%= course._id %>" title="Editar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                  </svg>
+                </a>
+                <a href="/gestor/cursos?confirm_delete=<%= course._id %>" class="danger" title="Apagar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                  </svg>
+                </a>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<% if (editingCourse) { %>
+  <%- include("../partials/course-modal", { course: editingCourse, mode: "edit" }) %>
+<% } %>
+
+<% if (deleteCandidate) { %>
+  <%- include("../partials/course-modal", { course: deleteCandidate, mode: "delete" }) %>
+<% } %>
+
+<% if (editingCourse || deleteCandidate) { %>
+  <script>
+    document.body.classList.add('app-modal-open');
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        window.location.href = '/gestor/cursos';
+      }
+    });
+  </script>
+<% } %>
+
+<%- include("../partials/app-end") %>

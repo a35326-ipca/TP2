@@ -1,0 +1,16 @@
+<!DOCTYPE html>
+<html lang="pt">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png" href="/statics/img/logo.png">
+  <link rel="stylesheet" href="/statics/app.css">
+  <link rel="stylesheet" href="/statics/toasts.css">
+  <title><%= title || "Gc" %></title>
+</head>
+<body class="<%= currentUser ? "app-body" : "" %>">
+  <div class="screen-size-lock" role="note" aria-live="polite">Esta plataforma só suporta telas acima de 1024px.</div>
+  <%- body %>
+  <script src="/statics/toasts.js"></script>
+</body>
+</html>

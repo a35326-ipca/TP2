@@ -1,0 +1,72 @@
+<%- include("../partials/app-start") %>
+
+<section class="app-panel profile-panel">
+  <div class="app-panel__header">
+    <div>
+      <h2>Adicionar alunos</h2>
+      <p>Nesta secção pode selecionar e adicionar alunos à pauta atual, permitindo associar os respetivos registos de avaliação. Após a inclusão, será possível consultar, editar e guardar as classificações finais diretamente nesta pauta.</p>
+    </div>
+  </div>
+
+  <form method="post" action="/funcionario/pautas/<%= sheet._id %>/alunos" class="app-form app-form--grid profile-form" novalidate>
+    <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+    <div class="app-field profile-form__actions">
+      <label for="student_user_id">Aluno</label>
+      <select id="student_user_id" name="student_user_id">
+        <option value="">Seleciona um aluno</option>
+        <% availableStudents.forEach((student) => { %>
+          <option value="<%= student._id %>"><%= student.name %> · <%= student.email %></option>
+        <% }) %>
+      </select>
+    </div>
+    <div class="app-form__actions profile-form__actions">
+      <button type="submit" class="app-button app-button--primary">Adicionar aluno</button>
+    </div>
+  </form>
+</section>
+
+<section class="app-panel">
+  <div class="app-panel__header">
+    <div>
+      <h2>Gestão das notas</h2>
+      <p>Nesta secção pode editar e guardar as classificações finais dos alunos associados a esta pauta.</p>
+    </div>
+  </div>
+
+  <form method="post" action="/funcionario/pautas/<%= sheet._id %>/notas">
+    <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+    <div class="app-table-wrap">
+      <table class="app-table">
+        <thead>
+          <tr>
+            <th>Aluno</th>
+            <th>E-mail</th>
+            <th>Nota final</th>
+          </tr>
+        </thead>
+        <tbody>
+          <% if (!students.length) { %>
+            <tr><td colspan="3"><p class="empty-text">Ainda não existem alunos associados à pauta.</p></td></tr>
+          <% } %>
+          <% students.forEach((row, index) => { %>
+            <tr>
+              <td><%= row.studentUserId?.name || "-" %></td>
+              <td><%= row.studentUserId?.email || "-" %></td>
+              <td>
+                <input type="hidden" name="entries[<%= index %>][id]" value="<%= row._id %>">
+                <input type="number" name="entries[<%= index %>][finalGrade]" min="0" max="20" step="0.01" value="<%= row.finalGrade ?? "" %>">
+              </td>
+            </tr>
+          <% }) %>
+        </tbody>
+      </table>
+    </div>
+    <% if (students.length) { %>
+      <div class="app-form__actions profile-form__actions" style="margin-top: 16px;">
+        <button type="submit" class="app-button app-button--primary">Guardar notas</button>
+      </div>
+    <% } %>
+  </form>
+</section>
+
+<%- include("../partials/app-end") %>

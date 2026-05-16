@@ -1,0 +1,10 @@
+<%- include("../partials/app-start") %>
+<%- include("../partials/metric-cards", { cards }) %>
+<section class="hub-grid">
+  <article class="app-card hub-card"><div class="hub-card__body"><h2>Utilizadores e cargos</h2><p>Área destinada à gestão dos utilizadores do sistema, incluindo alunos, funcionários e gestores, permitindo criar, editar, alterar cargos e remover contas quando necessário.</p><a href="/gestor/utilizadores" class="app-link">Abrir gestão de utilizadores</a></div></article>
+  <article class="app-card hub-card"><div class="hub-card__body"><h2>Cursos</h2><p>Área que permite manter a oferta formativa organizada, garantindo que os cursos disponíveis no sistema estão ativos, consistentes e prontos para serem utilizados.</p><a href="/gestor/cursos" class="app-link">Gerir cursos</a></div></article>
+  <article class="app-card hub-card"><div class="hub-card__body"><h2>Unidades curriculares</h2><p>Área destinada à atualização da base de Unidades Curriculares (UCs), utilizadas nos planos de estudo, nas fichas das disciplinas e nas pautas de avaliação do sistema.</p><a href="/gestor/ucs" class="app-link">Gerir UCs</a></div></article>
+  <article class="app-card hub-card"><div class="hub-card__body"><h2>Plano de estudos</h2><p>Área que permite associar Unidades Curriculares (UCs) aos diferentes cursos, organizando-as por ano e semestre, evitando duplicações e garantindo uma estrutura académica coerente no sistema.</p><a href="/gestor/plano" class="app-link">Configurar plano</a></div></article>
+  <article class="app-card hub-card hub-card--compact hub-card--full hub-card--centered"><div class="hub-card__body"><h2>Fichas dos alunos</h2><p>Área que permite consultar, aprovar ou rejeitar fichas submetidas, adicionando observações e mantendo um registo de auditoria para garantir transparência e controlo no processo.</p><a href="/gestor/fichas" class="app-link">Rever fichas</a></div></article>
+</section>
+<%- include("../partials/app-end") %>

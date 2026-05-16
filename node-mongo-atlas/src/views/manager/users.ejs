@@ -1,0 +1,225 @@
+<%- include("../partials/app-start") %>
+
+<section class="app-panel profile-panel">
+  <div class="app-panel__header">
+    <div>
+      <h2>Criar utilizador</h2>
+      <p>Esta secção permite adicionar novas contas ao sistema, sejam elas de aluno, funcionário ou gestor. Ao criar uma conta, são definidos os dados básicos do utilizador e o respetivo cargo, garantindo que cada pessoa tem acesso às funcionalidades adequadas dentro da plataforma.</p>
+    </div>
+  </div>
+
+  <form method="post" action="/gestor/utilizadores" class="app-form app-form--grid profile-form" novalidate>
+    <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+
+    <div class="app-field">
+      <label for="name">Nome</label>
+      <input id="name" type="text" name="name" value="" required>
+    </div>
+    <div class="app-field">
+      <label for="email">E-mail</label>
+      <input id="email" type="email" name="email" value="" required>
+    </div>
+    <div class="app-field">
+      <label for="role">Cargo</label>
+      <select id="role" name="role">
+        <option value="aluno" selected>Aluno</option>
+        <option value="funcionario">Funcionário</option>
+        <option value="gestor">Gestor</option>
+      </select>
+    </div>
+    <div class="app-field">
+      <label for="password">Palavra-passe</label>
+      <div class="password-field">
+        <input id="password" type="password" name="password" value="">
+        <button class="toggle-password" type="button" data-toggle-password="password" aria-label="Mostrar palavra-passe">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <div class="app-form__actions profile-form__actions">
+      <button type="submit" class="app-button app-button--primary">Criar utilizador</button>
+    </div>
+  </form>
+</section>
+
+<section class="app-panel">
+  <div class="app-panel__header">
+    <div>
+      <h2>Gestão de utilizadores</h2>
+      <p>Secção que apresenta a lista completa de utilizadores do sistema, juntamente com o respetivo cargo atual. Através desta área é possível consultar as contas existentes e aceder às opções de gestão, como editar dados, alterar cargos ou remover utilizadores quando necessário.</p>
+    </div>
+  </div>
+
+  <div class="app-table-wrap">
+    <table class="app-table">
+      <colgroup>
+        <col class="app-table__col-name">
+        <col class="app-table__col-email">
+        <col class="app-table__col-role">
+        <col class="app-table__col-date">
+        <col class="app-table__col-actions">
+      </colgroup>
+      <thead>
+        <tr>
+          <th class="app-table__name-col">Nome</th>
+          <th class="app-table__email-col">E-mail</th>
+          <th class="app-table__role-col">Cargo</th>
+          <th class="app-table__date-col">Registado</th>
+          <th class="app-table__actions-col">Ações</th>
+        </tr>
+      </thead>
+      <tbody>
+        <% users.forEach((user) => { %>
+          <tr>
+            <td class="app-table__name-col"><%= user.name %></td>
+            <td class="app-table__email-col"><%= user.email %></td>
+            <td class="app-table__role-col"><%- include("../partials/status-badge", { status: roleLabel(user.role) }) %></td>
+            <td class="app-table__date-col"><%= formatDate(user.createdAt) %></td>
+            <td class="app-table__actions-col">
+              <div class="table-actions">
+                <a href="/gestor/utilizadores?edit=<%= user._id %>" title="Editar">
+                  <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="m16.862 4.487 1.687-1.688a1.875 1.875 0 1 1 2.652 2.652L6.832 19.82a4.5 4.5 0 0 1-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 0 1 1.13-1.897L16.863 4.487Zm0 0L19.5 7.125" />
+                  </svg>
+                </a>
+                <% if (`${user._id}` !== `${currentUser.id}`) { %>
+                  <a href="/gestor/utilizadores?confirm_delete=<%= user._id %>" class="danger" title="Remover">
+                    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                      <path stroke-linecap="round" stroke-linejoin="round" d="m14.74 9-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 0 1-2.244 2.077H8.084a2.25 2.25 0 0 1-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 0 0-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 0 1 3.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 0 0-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 0 0-7.5 0" />
+                    </svg>
+                  </a>
+                <% } %>
+              </div>
+            </td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</section>
+
+<% if (editingUser) { %>
+  <div class="app-modal is-open" id="edit-user-modal">
+    <a href="/gestor/utilizadores" class="app-modal__backdrop" aria-label="Fechar edição do utilizador"></a>
+
+    <section class="app-modal__dialog app-panel profile-panel" role="dialog" aria-modal="true" aria-labelledby="edit-user-title">
+      <div class="app-modal__header">
+        <div>
+          <h2 id="edit-user-title">Editar utilizador</h2>
+          <p>Nesta parte, podes atualizar os dados da conta selecionada e ajustar o cargo ou o nível de acesso do utilizador, mantendo as informações e as permissões corretas no sistema.</p>
+        </div>
+        <a href="/gestor/utilizadores" class="app-modal__close" aria-label="Fechar modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </a>
+      </div>
+
+      <form method="post" action="/gestor/utilizadores/<%= editingUser._id %>" class="app-form app-form--grid profile-form" novalidate>
+        <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+
+        <div class="app-field">
+          <label for="edit-name">Nome</label>
+          <input id="edit-name" type="text" name="name" value="<%= editingUser.name %>" required>
+        </div>
+        <div class="app-field">
+          <label for="edit-email">E-mail</label>
+          <input id="edit-email" type="email" name="email" value="<%= editingUser.email %>" required>
+        </div>
+        <div class="app-field">
+          <label for="edit-role">Cargo</label>
+          <select id="edit-role" name="role">
+            <option value="aluno" <%= editingUser.role === "aluno" ? "selected" : "" %>>Aluno</option>
+            <option value="funcionario" <%= editingUser.role === "funcionario" ? "selected" : "" %>>Funcionário</option>
+            <option value="gestor" <%= editingUser.role === "gestor" ? "selected" : "" %>>Gestor</option>
+          </select>
+        </div>
+        <div class="app-field">
+          <label for="edit-password">Nova palavra-passe (opcional)</label>
+          <div class="password-field">
+            <input id="edit-password" type="password" name="password" value="">
+            <button class="toggle-password" type="button" data-toggle-password="edit-password" aria-label="Mostrar palavra-passe">
+              <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+                <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+              </svg>
+            </button>
+          </div>
+        </div>
+
+        <div class="app-form__actions profile-form__actions">
+          <button type="submit" class="app-button app-button--primary">Guardar utilizador</button>
+        </div>
+      </form>
+    </section>
+  </div>
+<% } %>
+
+<% if (deleteCandidate && `${deleteCandidate._id}` !== `${currentUser.id}`) { %>
+  <div class="app-modal is-open" id="delete-user-modal">
+    <a href="/gestor/utilizadores" class="app-modal__backdrop" aria-label="Fechar confirmação de remoção"></a>
+
+    <section class="app-modal__dialog app-panel profile-panel app-modal__dialog--compact" role="dialog" aria-modal="true" aria-labelledby="delete-user-title">
+      <div class="app-modal__header">
+        <div>
+          <h2 id="delete-user-title">Remover utilizador</h2>
+          <p>Vais remover a conta de <strong><%= deleteCandidate.name %></strong>. Esta ação elimina o acesso deste utilizador ao sistema.</p>
+        </div>
+        <a href="/gestor/utilizadores" class="app-modal__close" aria-label="Fechar modal">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+            <path stroke-linecap="round" stroke-linejoin="round" d="M6 18 18 6M6 6l12 12" />
+          </svg>
+        </a>
+      </div>
+
+      <div class="app-modal__content">
+        <p class="helper-text">E-mail: <strong><%= deleteCandidate.email %></strong></p>
+        <p class="helper-text">Cargo: <strong><%= roleLabel(deleteCandidate.role) %></strong></p>
+      </div>
+
+      <form method="post" action="/gestor/utilizadores/<%= deleteCandidate._id %>" class="app-form__actions app-modal__actions app-modal__actions--single">
+        <input type="hidden" name="csrf_token" value="<%= csrfToken %>">
+        <input type="hidden" name="intent" value="delete">
+        <button type="submit" class="app-button app-button--danger">Confirmar eliminação</button>
+      </form>
+    </section>
+  </div>
+<% } %>
+
+<% if (editingUser || deleteCandidate) { %>
+  <script>
+    document.body.classList.add('app-modal-open');
+
+    document.addEventListener('keydown', function (event) {
+      if (event.key === 'Escape') {
+        window.location.href = '/gestor/utilizadores';
+      }
+    });
+  </script>
+<% } %>
+
+<script>
+  const eyeIcon = `
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M2.036 12.322a1.012 1.012 0 0 1 0-.639C3.423 7.51 7.36 4.5 12 4.5c4.638 0 8.573 3.007 9.963 7.178.07.207.07.431 0 .639C20.577 16.49 16.64 19.5 12 19.5c-4.638 0-8.573-3.007-9.963-7.178Z" />
+      <path stroke-linecap="round" stroke-linejoin="round" d="M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0Z" />
+    </svg>`;
+  const eyeOffIcon = `
+    <svg viewBox="0 0 24 24" fill="none" stroke-width="1.5" stroke="currentColor" aria-hidden="true">
+      <path stroke-linecap="round" stroke-linejoin="round" d="M3.98 8.223A10.477 10.477 0 0 0 1.934 12C3.226 16.338 7.244 19.5 12 19.5c.993 0 1.953-.138 2.863-.395M6.228 6.228A10.451 10.451 0 0 1 12 4.5c4.756 0 8.773 3.162 10.065 7.498a10.522 10.522 0 0 1-4.293 5.774M6.228 6.228 3 3m3.228 3.228 3.65 3.65m7.894 7.894L21 21m-3.228-3.228-3.65-3.65m0 0a3 3 0 1 0-4.243-4.243m4.242 4.242L9.88 9.88" />
+    </svg>`;
+
+  document.querySelectorAll('[data-toggle-password]').forEach((button) => {
+    button.addEventListener('click', () => {
+      const input = document.getElementById(button.dataset.togglePassword);
+      const isPassword = input.type === 'password';
+      input.type = isPassword ? 'text' : 'password';
+      button.innerHTML = isPassword ? eyeIcon : eyeOffIcon;
+      button.setAttribute('aria-label', isPassword ? 'Ocultar palavra-passe' : 'Mostrar palavra-passe');
+    });
+  });
+</script>
+
+<%- include("../partials/app-end") %>

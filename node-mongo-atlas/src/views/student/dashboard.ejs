@@ -1,0 +1,28 @@
+<%- include("../partials/app-start") %>
+<%- include("../partials/metric-cards", { cards }) %>
+<section class="hub-grid hub-grid--compact">
+  <article class="app-card hub-card hub-card--compact <%= studentAccessUnlocked ? "" : "hub-card--full hub-card--centered" %>">
+    <div class="hub-card__body">
+      <h2>Ficha do aluno</h2>
+      <p>Preenche e atualiza os teus dados pessoais e de contacto, adiciona a tua fotografia e submete a ficha para validação, garantindo que a tua informação está completa e correta.</p>
+      <a href="/aluno/ficha" class="app-link">Abrir ficha</a>
+    </div>
+  </article>
+  <% if (studentAccessUnlocked) { %>
+    <article class="app-card hub-card hub-card--compact">
+      <div class="hub-card__body">
+        <h2>Pedido de matrícula</h2>
+        <p>Seleciona um curso disponível, cria o teu pedido de matrícula e acompanha todo o processo de decisão por parte do funcionário. Permite-te gerir as tuas candidaturas de forma simples, organizada e sempre atualizada.</p>
+        <a href="/aluno/matriculas" class="app-link">Abrir pedidos</a>
+      </div>
+    </article>
+    <article class="app-card hub-card hub-card--compact hub-card--full hub-card--centered">
+      <div class="hub-card__body">
+        <h2>Notas finais</h2>
+        <p>Consulta de forma simples as classificações finais já lançadas nas UCs em que estás associado, sem alterar qualquer dado académico.</p>
+        <a href="/aluno/notas" class="app-link">Abrir notas</a>
+      </div>
+    </article>
+  <% } %>
+</section>
+<%- include("../partials/app-end") %>

@@ -1,0 +1,41 @@
+<div class="toast-stack" id="toastStack" aria-live="polite" aria-atomic="false"></div>
+<script id="flashData" type="application/json"><%- JSON.stringify(flash || null) %></script>
+
+<div class="app-shell">
+  <aside class="app-dock" aria-label="Navegação principal">
+    <nav class="app-dock__nav">
+      <% navItems.forEach((item) => { %>
+        <a href="<%= item.href %>" class="app-dock__link <%= item.href === activeHref ? "is-active" : "" %>" aria-label="<%= item.label %>">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke="currentColor" aria-hidden="true">
+            <%- iconPath(item.icon) %>
+          </svg>
+          <span><%= item.label %></span>
+        </a>
+      <% }) %>
+    </nav>
+    <a href="/logout" class="app-dock__link app-dock__link--logout" aria-label="Terminar sessão">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="1.7" stroke="currentColor" aria-hidden="true">
+        <path stroke-linecap="round" stroke-linejoin="round" d="M13.5 4.5 21 12m0 0-7.5 7.5M21 12H3" />
+      </svg>
+      <span>Sair</span>
+    </a>
+  </aside>
+
+  <main class="app-main">
+    <header class="app-header">
+      <div>
+        <span class="app-header__eyebrow"><%= roleLabel(currentUser?.role || "") %></span>
+        <h1><%= pageTitle %></h1>
+        <p><%= pageDescription %></p>
+      </div>
+      <% if (typeof headerActions !== "undefined" && headerActions?.length) { %>
+        <div class="app-header__actions">
+          <% headerActions.forEach((action) => { %>
+            <a href="<%= action.href %>" class="app-button <%= action.class || "app-button--ghost" %>" aria-label="<%= action.label %>">
+              <% if (action.iconSvg) { %><%- action.iconSvg %><% } else { %><%= action.label %><% } %>
+            </a>
+          <% }) %>
+        </div>
+      <% } %>
+    </header>
+    <div class="app-content">

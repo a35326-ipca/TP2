@@ -1,0 +1,26 @@
+{
+  "name": "tp2-node-mongo-atlas",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "description": "Migração do projeto TP2 de PHP/MySQL para Node.js, Express, EJS e MongoDB Atlas.",
+  "scripts": {
+    "dev": "node --watch src/server.js",
+    "start": "node src/server.js",
+    "seed": "node src/scripts/seedDefaultUsers.js",
+    "migrate:mysql": "node src/scripts/migrateFromMysql.js"
+  },
+  "dependencies": {
+    "bcryptjs": "^2.4.3",
+    "connect-mongo": "^5.1.0",
+    "dotenv": "^16.4.5",
+    "ejs": "^5.0.2",
+    "express": "^4.21.2",
+    "express-session": "^1.18.1",
+    "method-override": "^3.0.0",
+    "mongoose": "^8.13.2",
+    "multer": "^1.4.5-lts.1",
+    "morgan": "^1.10.0",
+    "mysql2": "^3.14.0"
+  }
+}

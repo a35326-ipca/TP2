@@ -1,0 +1,39 @@
+<%- include("../partials/app-start") %>
+<%- include("../partials/metric-cards", { cards }) %>
+<section class="app-panel">
+  <div class="app-panel__header">
+    <div>
+      <h2>Notas finais</h2>
+      <p>Aqui podes consultar as classificações finais já registadas pelo funcionário nas pautas das unidades curriculares em que estás inscrito.</p>
+    </div>
+  </div>
+  <div class="app-table-wrap">
+    <table class="app-table app-table--student-grades">
+      <colgroup>
+        <col class="app-table__plan-course-col">
+        <col class="app-table__plan-unit-col">
+        <col class="app-table__course-created-col">
+        <col class="app-table__plan-semester-col">
+        <col class="app-table__course-state-col">
+      </colgroup>
+      <thead>
+        <tr><th class="app-table__plan-course-col">Curso</th><th class="app-table__plan-unit-col">UC</th><th class="app-table__course-created-col">Ano letivo</th><th class="app-table__plan-semester-col">Época</th><th class="app-table__course-state-col">Nota final</th></tr>
+      </thead>
+      <tbody>
+        <% if (!grades.length) { %>
+          <tr><td colspan="5"><p class="empty-text">Ainda não existem notas disponíveis.</p></td></tr>
+        <% } %>
+        <% grades.forEach((grade) => { %>
+          <tr>
+            <td class="app-table__plan-course-col"><div class="app-text-flow--scroll"><%= grade.courseName || "-" %></div></td>
+            <td class="app-table__plan-unit-col"><div class="app-text-flow--scroll"><%= grade.sheetId?.unitId?.name || "-" %></div></td>
+            <td class="app-table__course-created-col"><%= grade.sheetId?.academicYear || "-" %></td>
+            <td class="app-table__plan-semester-col"><%= grade.sheetId?.season || "-" %></td>
+            <td class="app-table__course-state-col"><%= grade.finalGrade ?? "-" %></td>
+          </tr>
+        <% }) %>
+      </tbody>
+    </table>
+  </div>
+</section>
+<%- include("../partials/app-end") %>
