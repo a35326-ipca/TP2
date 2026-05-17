@@ -710,7 +710,7 @@ webRouter.post("/funcionario/pautas/:id/alunos", requireRole("funcionario"), asy
 
   const rawIds = Array.isArray(req.body.studentUserIds)
     ? req.body.studentUserIds
-    : [req.body.studentUserId ?? req.body.student_user_id];
+    : [req.body.studentUserIds ?? req.body.studentUserId ?? req.body.student_user_id];
   const ids = rawIds.map((value) => selectedId(value)).filter(Boolean);
 
   if (!ids.length) {
