@@ -1016,8 +1016,8 @@ webRouter.post("/gestor/utilizadores", requireRole("gestor"), asyncRoute(async (
   const email = normalizeEmail(req.body.email);
   const password = `${req.body.password ?? ""}`;
   const role = ["aluno", "funcionario", "gestor"].includes(req.body.role) ? req.body.role : "aluno";
-  if (!name || !email || !password || !isValidEmail(email) || !isStrongPassword(password)) {
-    setFlash(req, "error", "Preenche nome, e-mail, cargo e uma palavra-passe válida.");
+  if (!name || !email || !password || !isValidEmail(email)) {
+    setFlash(req, "error", "Preenche nome, e-mail e palavra-passe.");
     return res.redirect("/gestor/utilizadores");
   }
   await User.create({ name, email, role, passwordHash: await User.hashPassword(password) });
