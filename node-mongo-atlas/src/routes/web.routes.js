@@ -1051,10 +1051,6 @@ webRouter.post("/gestor/utilizadores/:id", requireRole("gestor"), asyncRoute(asy
       return res.redirect(`/gestor/utilizadores?edit=${id}`);
     }
     if (password) {
-      if (!isStrongPassword(`${req.body.password}`)) {
-        setFlash(req, "error", "A nova palavra-passe deve ter pelo menos 8 caracteres, uma maiúscula, uma minúscula e um número.");
-        return res.redirect(`/gestor/utilizadores?edit=${id}`);
-      }
       update.passwordHash = await User.hashPassword(`${req.body.password}`);
     }
     await User.findByIdAndUpdate(id, update);
